@@ -25,9 +25,19 @@ def numero(n):
 def username(user_id, username):
   return f"<h1>Hola, {username}! Tu ID es: {user_id}</h1>"
 
-@app.route("/suma/<float:n1>/<float:n2>")
-def suma(n1, n2):
-  return f"<h1>La suma es: {n1 + n2}</h1>"
+@app.route("/operas")
+def operas():
+    return '''
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+            <br><br>
+            
+            <label for="apellidos">Apellidos:</label>
+            <input type="text" id="apellidos" name="apellidos" required>
+            <br><br>
+            
+            <button type="submit">Enviar</button>
+        </form>'''
 
 @app.route("/default")
 @app.route("/default/<string:param>")
