@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cinepolis</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #0047AB;
+            color: white;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .content {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+        .inputs, .outputs {
+            width: 48%;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            background-color: #333;
+        }
+        h2 {
+            color: #FFD700;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #333;
+        }
+        .actions {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .actions button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #FFD700;
+            color: #333;
+            border: none;
+            cursor: pointer;
+        }
+        .outputs {
+            margin-top: 20px;
+        }
+        #error-message {
+            color: red;
+        }
+        #resultado-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #resultado-container p {
+            margin: 5px 0;
+        }
+        #resultado-container span {
+            font-weight: bold;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+            <div class="logo">
+                <img src="static/img/cinepolis_share.png" alt="Logo de Cinepolis">
+            </div>
+
+        <div class="content">
+            <div class="inputs">
+                <h2>Entradas</h2>
+                <form method="POST" action="/cinepolis">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+
+                    <label for="cantidad_compradores">Cantidad de Compradores:</label>
+                    <input type="number" id="cantidad_compradores" name="cantidad_compradores" required min="1" max="7">
+
+                    <label for="tarjeta_cineco">Tarjeta Cineco:</label>
+                    <select id="tarjeta_cineco" name="tarjeta_cineco">
+                        <option value="si">Sí</option>
+                        <option value="no">No</option>
+                    </select>
+
+                    <label for="cantidad_boletos">Cantidad de Boletos:</label>
+                    <input type="number" id="cantidad_boletos" name="cantidad_boletos" required min="1" max="7">
+
+                    <div class="actions">
+                        <button type="submit">Procesar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="outputs">
+                <h2>Salidas</h2>
+                {% if resultado %}
+                    {% if resultado.error %}
+                        <div id="error-message">{{ resultado.error }}</div>
+                    {% else %}
+                        <div id="resultado-container">
+                            <p>Nombre: <span id="resultado-nombre">{{ resultado.nombre }}</span></p>
+                            <p>Cantidad de Compradores: <span id="resultado-cantidad_compradores">{{ resultado.cantidad_compradores }}</span></p>
+                            <p>Cantidad de Boletos: <span id="resultado-cantidad_boletos">{{ resultado.cantidad_boletos }}</span></p>
+                            <p>Tarjeta Cineco: <span id="resultado-tarjeta_cineco">{{ resultado.tarjeta_cineco }}</span></p>
+                            <p>Valor a Pagar: <span id="resultado-total">${{ resultado.total }}</span></p>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
