@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zodiaco Chino</title>
+    <link rel="stylesheet" href="static/css/zodiaco.css">
+</head>
+<body>
+    <div class="formulario">
+        <h2>Datos Personales</h2>
+        <form action="/resultado" method="post">
+            <label for="nombre">Nombre:</label>
+            <input type="text" name="nombre" required><br>
+
+            <label for="apellido">Apellido:</label>
+            <input type="text" name="apellido" required><br>
+
+            <label for="dia">Día:</label>
+            <input type="number" name="dia" min="1" max="31" required><br>
+
+            <label for="mes">Mes:</label>
+            <input type="number" name="mes" min="1" max="12" required><br>
+
+            <label for="anio">Año:</label>
+            <input type="number" name="anio" min="1900" max="2025" required><br>
+
+            <label>Sexo:</label><br>
+            <input type="radio" name="sexo" value="Masculino" required> Masculino
+            <input type="radio" name="sexo" value="Femenino"> Femenino<br><br>
+
+            <button type="submit">IMPRIMIR</button>
+        </form>
+    </div>
+
+    {% if signo %}
+    <div class="resultado">
+        <h3>Resultado:</h3>
+        <p>Hola <b>{{ nombre }} {{ apellido }}</b></p>
+        <p>Tienes <b>{{ edad }}</b> años.</p>
+        <p>Tu signo zodiacal chino es: <b>{{ signo }}</b></p>
+        <img src="/static/{{ imagen }}" alt="{{ signo }}">
+        <br>
+    </div>
+    {% endif %}
+</body>
+</html>
