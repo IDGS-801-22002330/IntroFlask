@@ -1,0 +1,12 @@
+{% macro input_field(name, label, type="text", placeholder="") %}
+    <label for="{{ name }}">{{ label }}:</label>
+    <input type="{{ type }}" name="{{ name }}" id="{{ name }}" placeholder="{{ placeholder }}" required>
+    <br>
+{% endmacro %}
+
+{% macro camposNuevos(field) %}
+    <tr>
+        <td>{{ field.label }}</td>
+        <td>{{ field(**kwargs) | safe }}</td>
+    </tr>
+{% endmacro %}
