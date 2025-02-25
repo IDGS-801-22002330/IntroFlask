@@ -1,13 +1,33 @@
 from flask import Flask, render_template, request, jsonify
+from flask import redirect, url_for, flash, g
 from datetime import datetime
-from forms import UserForm
 import forms
+from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
+app.secret_key="contrasenia"
+csrf=CSRFProtect()
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.before_request
+def before_request():
+    print("BEFORER1")
+    return None
+    
+@app.after_request
+def after_request(response):
+    print("AFTERR1")
+    return response
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    nom="None"
+    titulo="IDGS801"
+    lista=["Pedro", "Luis", "Juan"]
+    return render_template('index.html', titulo=titulo, nom=nom, lista=lista)
 
 @app.route("/ejemplo1")
 def ejemplo1(): 
@@ -143,12 +163,18 @@ def alumnos():
     ape=""
     email=""
     alumno_class=forms.UserForm(request.form)
-    if request.method == "POST":
+    if request.method == "POST" and alumno_class.validate():
         mat = alumno_class.matricula.data
         nom = alumno_class.nombre.data
         ape = alumno_class.apellido.data
         email = alumno_class.correo.data
+       
+        mensaje = 'Bienvenido {}'.format(nom)
+        flash(mensaje) 
         
     return render_template("Alumnos.html", form=alumno_class, mat=mat, nom=nom, ape=ape, email=email)
+
+
 if __name__ == "__main__":
+    csrf.init_app(app)
     app.run(debug=True, port=3000)
