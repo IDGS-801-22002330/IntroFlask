@@ -1,13 +1,17 @@
-from flask import Flask, render_template, request, jsonify
-from flask import redirect, url_for, flash, g
+from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 import forms
 from flask_wtf.csrf import CSRFProtect
+from flask import flash
+from flask import g
 
 app = Flask(__name__)
 app.secret_key="contrasenia"
 csrf=CSRFProtect()
 
+
+
+# __________________________ 404 __________________________
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
@@ -22,67 +26,113 @@ def after_request(response):
     print("AFTERR1")
     return response
 
+
+
+# __________________________ PRODUCTO VARIO __________________________
 @app.route("/")
 def index():
-    nom="None"
-    titulo="IDGS801"
-    lista=["Pedro", "Luis", "Juan"]
-    return render_template('index.html', titulo=titulo, nom=nom, lista=lista)
+    nom='None'
+    titulo = "IDGS801"
+    lista = ["pedro", "juan", "luis"]
+    nom = g.user
+    print("Index 2 {}".format(g.user))
+    return render_template("index.html", titulo=titulo,nom=nom, lista=lista)
 
 @app.route("/ejemplo1")
-def ejemplo1(): 
+def ejemplo1():
     return render_template("ejemplo1.html")
 
 @app.route("/ejemplo2")
 def ejemplo2():
     return render_template("ejemplo2.html")
 
-@app.route("/operasBas", methods=["GET", "POST"])
-def operasBas():
-    if request.method == "POST":
-        try:
-            n1 = int(request.form.get("n1"))
-            n2 = int(request.form.get("n2"))
-            resultado = n1 * n2
-            return render_template("resultado.html", n1=n1, n2=n2, resultado=resultado)
-        except ValueError:
-            return "Error: Ingresa números válidos"
-    return render_template("operasBas.html")
-
 @app.route("/hola")
 def hola():
-    return "<h1>Ola de mar</h1>"
+    return "<h1>Hola, mundo---Hola--</h1>"
 
-@app.route("/user/<string:username>")
-def user(username):
-    return f"<h1>Hola, {username}!</h1>"
+@app.route("/user/<string:user>")
+def user(user):
+    return f"<h1>Hello {user}</h1>"
 
 @app.route("/numero/<int:n>")
 def numero(n):
-    return f"<h1>El número es: {n}!</h1>"
+    return f"<h1>El número es: {n}</h1>"
 
-@app.route("/user/<int:user_id>/<string:username>")
-def username(user_id, username):
-    return f"<h1>Hola, {username}! Tu ID es: {user_id}</h1>"
+@app.route("/user/<int:id>/<string:username>")
+def username(id, username):
+    return f"<h1>Hello {username}, ¡Tu ID es: {id}!</h1>"
 
 @app.route("/suma/<float:n1>/<float:n2>")
 def suma(n1, n2):
     return f"<h1>La suma es: {n1 + n2}</h1>"
 
-@app.route("/default")
+@app.route("/default/")
 @app.route("/default/<string:param>")
-def func(param="Juan"):
-    return f"<h1>Hola {param}</h1>"
+def c(param="Juan"):
+    return f"<h1>Hola, {param}</h1>"
 
-@app.route("/operas", methods=["GET", "POST"]) 
-def operas():
-    if request.method == "POST":
-        nombre = request.form.get("nombre")
-        apellidos = request.form.get("apellidos")
-        return f"<h1>Nombre: {nombre}, Apellidos: {apellidos}</h1>"
-    return render_template("operas.html")
 
-# Cinepolis
+
+# __________________________ SIGNO ZODIACAL CHINO __________________________
+signos = [
+    "Mono", "Gallo", "Perro", "Cerdo", "Rata", "Buey",
+    "Tigre", "Conejo", "Dragon", "Serpiente", "Caballo", "Cabra"
+]
+
+@app.route("/zod", methods=["GET", "POST"])
+def zod():
+    zod_class = forms.ZodiacoForm(request.form)
+    nombre = ""
+    apellido = ""
+    edad = ""
+    signo = ""
+    imagen = ""
+    sexo = ""
+    
+    if request.method == "POST" and zod_class.validate():
+        nombre = zod_class.nombre.data
+        apellido = zod_class.apellido.data
+        dia = zod_class.dia.data
+        mes = zod_class.mes.data
+        anio = zod_class.anio.data
+        sexo = zod_class.sexo.data
+
+        hoy = datetime.now()
+        edad = hoy.year - anio - ((hoy.month, hoy.day) < (mes, dia))
+        signos = [
+            "Mono", "Gallo", "Perro", "Cerdo", "Rata", "Buey",
+            "Tigre", "Conejo", "Dragon", "Serpiente", "Caballo", "Cabra"
+        ]
+        signo = signos[anio % 12]
+        imagen = f"img/{signo.lower()}.jpg"
+        
+    return render_template('signo.html', form=zod_class, nombre=nombre, apellido=apellido, edad=edad, sexo=sexo, signo=signo, imagen=imagen)
+
+
+
+# __________________________ ALUMNOS __________________________
+@app.route("/Alumnos", methods=["GET", "POST"])
+def alumnos():
+    mat=""
+    nom=""
+    ape=""
+    email=""
+    alumno_class=forms.UserForm(request.form)
+    if request.method == "POST" and alumno_class.validate():
+        mat = alumno_class.matricula.data
+        nom = alumno_class.nombre.data
+        ape = alumno_class.apellido.data
+        email = alumno_class.correo.data
+       
+        mensaje = 'Bienvenido {}'.format(nom)
+        flash(mensaje) 
+        
+    return render_template("Alumnos.html", form=alumno_class, mat=mat, nom=nom, ape=ape, email=email)
+
+
+
+
+# __________________________ CINEPOLIS  __________________________
 MAX_BOLETOS = 7
 PRECIO_BOLETO = 12
 DESCUENTO_TARJETA = 0.1
@@ -133,46 +183,6 @@ def calcular_descuento(total_boletos, precio_total, usa_tarjeta):
         descuento += (precio_total - descuento) * DESCUENTO_TARJETA
     return descuento
 
-# Signos Zodiacales Chinos
-signos = ["Mono", "Gallo", "Perro", "Cerdo", "Rata", "Buey",
-          "Tigre", "Conejo", "Dragón", "Serpiente", "Caballo", "Cabra"]
-
-@app.route('/zod')
-def zod():
-    return render_template('signo.html')
-
-@app.route('/resultado', methods=['POST'])
-def resultado():
-    nombre = request.form['nombre']
-    apellido = request.form['apellido']
-    dia, mes, anio = int(request.form['dia']), int(request.form['mes']), int(request.form['anio'])
-    sexo = request.form['sexo']
-
-    hoy = datetime.now()
-    edad = hoy.year - anio - ((hoy.month, hoy.day) < (mes, dia))
-    signo = signos[anio % 12]
-    imagen = f"img/{signo.lower()}.jpg"
-
-    return render_template('signo.html', nombre=nombre, apellido=apellido, edad=edad, sexo=sexo, signo=signo, imagen=imagen)
-
-# Alumnos
-@app.route("/Alumnos", methods=["GET", "POST"])
-def alumnos():
-    mat=""
-    nom=""
-    ape=""
-    email=""
-    alumno_class=forms.UserForm(request.form)
-    if request.method == "POST" and alumno_class.validate():
-        mat = alumno_class.matricula.data
-        nom = alumno_class.nombre.data
-        ape = alumno_class.apellido.data
-        email = alumno_class.correo.data
-       
-        mensaje = 'Bienvenido {}'.format(nom)
-        flash(mensaje) 
-        
-    return render_template("Alumnos.html", form=alumno_class, mat=mat, nom=nom, ape=ape, email=email)
 
 
 if __name__ == "__main__":
